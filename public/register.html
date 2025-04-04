@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Simple API</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .register-header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .register-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .password-requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .password-strength {
+            height: 4px;
+            background: #e1e1e1;
+            margin-top: 8px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #0056b3;
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            display: none;
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 20px;
+            padding: 10px;
+            background: #ffe6e6;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .success-message {
+            display: none;
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 20px;
+            padding: 10px;
+            background: #e6ffe6;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            margin: 0 auto;
+            animation: spin 1s linear infinite;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>Create Account</h1>
+            <p>Fill in your details to get started</p>
+        </div>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+                <div class="password-strength">
+                    <div class="password-strength-bar"></div>
+                </div>
+                <div class="password-requirements">
+                    Password must be at least 8 characters long and contain:
+                    <ul>
+                        <li>At least one uppercase letter</li>
+                        <li>At least one lowercase letter</li>
+                        <li>At least one number</li>
+                        <li>At least one special character</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+            </div>
+            
+            <button type="submit" class="submit-btn">
+                <span>Create Account</span>
+                <div class="loading-spinner"></div>
+            </button>
+        </form>
+        
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+        
+        <div class="login-link">
+            Already have an account? <a href="login.html">Sign in</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('registerForm');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const submitBtn = form.querySelector('.submit-btn');
+            const loadingSpinner = document.querySelector('.loading-spinner');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const passwordStrengthBar = document.querySelector('.password-strength-bar');
+
+            const showError = (message) => {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+            };
+
+            const showSuccess = (message) => {
+                successMessage.textContent = message;
+                successMessage.style.display = 'block';
+                errorMessage.style.display = 'none';
+            };
+
+            const setLoading = (isLoading) => {
+                submitBtn.disabled = isLoading;
+                loadingSpinner.style.display = isLoading ? 'block' : 'none';
+                submitBtn.querySelector('span').style.display = isLoading ? 'none' : 'block';
+            };
+
+            const checkPasswordStrength = (password) => {
+                let strength = 0;
+                const patterns = [
+                    /[a-z]/, // lowercase
+                    /[A-Z]/, // uppercase
+                    /[0-9]/, // numbers
+                    /[^A-Za-z0-9]/, // special characters
+                    /.{8,}/ // length
+                ];
+
+                patterns.forEach(pattern => {
+                    if (pattern.test(password)) strength += 20;
+                });
+
+                passwordStrengthBar.style.width = strength + '%';
+                
+                if (strength <= 20) {
+                    passwordStrengthBar.style.backgroundColor = '#dc3545';
+                } else if (strength <= 40) {
+                    passwordStrengthBar.style.backgroundColor = '#ffc107';
+                } else if (strength <= 60) {
+                    passwordStrengthBar.style.backgroundColor = '#fd7e14';
+                } else if (strength <= 80) {
+                    passwordStrengthBar.style.backgroundColor = '#20c997';
+                } else {
+                    passwordStrengthBar.style.backgroundColor = '#28a745';
+                }
+
+                return strength >= 80;
+            };
+
+            passwordInput.addEventListener('input', () => {
+                checkPasswordStrength(passwordInput.value);
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const username = form.username.value.trim();
+                const email = form.email.value.trim();
+                const password = form.password.value;
+                const confirmPassword = form.confirmPassword.value;
+
+                if (!username || !email || !password || !confirmPassword) {
+                    showError('Please fill in all fields');
+                    return;
+                }
+
+                if (!checkPasswordStrength(password)) {
+                    showError('Please choose a stronger password');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    showError('Passwords do not match');
+                    return;
+                }
+
+                setLoading(true);
+
+                try {
+                    const response = await fetch('https://your-api-domain:4443/api/User', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            User: [{
+                                UserID: 'new',
+                                User: username,
+                                Email: email,
+                                Password: password
+                            }]
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.status === 'error') {
+                        throw new Error(data.message || 'Registration failed');
+                    }
+
+                    showSuccess('Registration successful! Redirecting to login...');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+
+                } catch (error) {
+                    showError(error.message || 'An error occurred. Please try again.');
+                } finally {
+                    setLoading(false);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
